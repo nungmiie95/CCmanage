@@ -1,282 +1,762 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ระบบการจัดการการผ่อนชำระ </title>
-  
-  <!-- Font & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการผ่อนชำระบัตรเครดิต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #FAFAF5;
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-primary: #2E7D32;
+            --color-danger: #D32F2F;
+            --color-info: #0288D1;
+            --color-card-bg: #FFFFFF;
+            --color-border: #E0E0E0;
+            --color-success-light: #E8F5E9;
+            --color-input-bg: #FAFAFA;
+        }
 
-  <style>
-    /* --- Styles & Variables --- */
-    :root {
-      --bg-color: #FAFAF5; 
-      --text-color: #333333;
-      --card-bg: #FFFFFF;
-      --primary-color: #4A6FA5;
-      --success-color: #4CAF50;
-      --danger-color: #E57373;
-      --border-radius: 12px;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * { box-sizing: border-box; }
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
 
-    body {
-      font-family: 'Sarabun', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0; padding: 20px; font-size: 18px; line-height: 1.6;
-    }
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
 
-    .container { max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
-    h1, h2, h3 { color: #2c3e50; margin-top: 0; }
-    h2 { font-size: 1.5rem; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
-    
-    /* Dashboard */
-    .dashboard { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px; }
-    @media (min-width: 768px) { .dashboard { grid-template-columns: 1fr 1fr; body { font-size: 20px; } } }
-    
-    .stat-card { background: var(--card-bg); padding: 25px; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e0e0e0; }
-    .stat-title { font-size: 1.1rem; color: #666; }
-    .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin: 10px 0; }
-    .stat-unit { font-size: 1rem; color: #888; }
-    
-    /* Form */
-    .form-container { background: var(--card-bg); padding: 25px; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 40px; }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; }
-    input, select { width: 100%; padding: 15px; font-size: 1.1rem; border: 2px solid #ccc; border-radius: 8px; font-family: 'Sarabun', sans-serif; background: #fff; }
-    input:focus { border-color: var(--primary-color); outline: none; }
-    
-    button { cursor: pointer; font-family: 'Sarabun', sans-serif; border: none; transition: 0.2s; }
-    .btn-main { width: 100%; background-color: var(--primary-color); color: white; font-size: 1.2rem; font-weight: 600; padding: 18px; border-radius: 8px; box-shadow: 0 4px 0 #34517b; }
-    .btn-main:active { transform: translateY(2px); box-shadow: 0 2px 0 #34517b; }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
 
-    /* List */
-    #installmentList { display: grid; grid-template-columns: 1fr; gap: 20px; }
-    @media (min-width: 600px) { #installmentList { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); } }
-    
-    .card { background: var(--card-bg); padding: 20px; border-radius: var(--border-radius); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 8px solid var(--primary-color); position: relative; }
-    .card.paid-off { border-left-color: var(--success-color); background-color: #f9fff9; opacity: 0.9; }
-    .card-header { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
-    .card-sub { color: #666; margin-bottom: 15px; font-size: 1rem; }
-    
-    .card-stat { display: flex; justify-content: space-between; align-items: center; background: #f0f4f8; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; }
-    .remaining-badge { font-size: 1.2rem; font-weight: 700; color: #d32f2f; }
-    .paid-badge { color: var(--success-color); font-weight: bold; }
-    
-    .btn-pay { width: 100%; background-color: var(--success-color); color: white; padding: 15px; font-size: 1.1rem; border-radius: 8px; margin-bottom: 10px; font-weight: 600; }
-    .btn-delete { width: 100%; background: transparent; border: 2px solid #ddd; color: #888; padding: 10px; border-radius: 8px; font-size: 1rem; }
-    .btn-delete:hover { border-color: var(--danger-color); color: var(--danger-color); background: #fff5f5; }
+        /* ===== Header ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+            color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    /* Loading */
-    #loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--primary-color); z-index: 999; display: none; flex-direction: column; }
-    .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  </style>
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* ===== Dashboard Summary ===== */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-box {
+            background: var(--color-card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--color-primary);
+        }
+
+        .summary-box.danger {
+            border-left-color: var(--color-danger);
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--color-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .summary-box.danger .summary-value {
+            color: var(--color-danger);
+        }
+
+        /* ===== Form Section ===== */
+        .form-section {
+            background: var(--color-card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--color-text);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            background-color: var(--color-input-bg);
+            color: var(--color-text);
+            font-family: 'Sarabun', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-text-light);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* ===== Buttons ===== */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sarabun', sans-serif;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #FFFFFF;
+            grid-column: 1 / -1;
+        }
+
+        .btn-primary:hover {
+            background-color: #1B5E20;
+        }
+
+        .btn-reset {
+            background-color: #9E9E9E;
+            color: #FFFFFF;
+        }
+
+        .btn-reset:hover {
+            background-color: #757575;
+        }
+
+        /* ===== Items List ===== */
+        .items-section {
+            margin-bottom: 24px;
+        }
+
+        .items-section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--color-text);
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .item-card {
+            background: var(--color-card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--color-primary);
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .item-card.completed {
+            border-top-color: #4CAF50;
+            background: var(--color-success-light);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .item-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text);
+            flex: 1;
+        }
+
+        .item-bank {
+            display: inline-block;
+            background-color: var(--color-info);
+            color: #FFFFFF;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .item-status {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: #FFFFFF;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .item-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            background-color: var(--color-input-bg);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--color-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .detail-highlight {
+            border-left-color: #FF9800;
+        }
+
+        .detail-highlight .detail-value {
+            color: #FF9800;
+        }
+
+        .item-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-pay {
+            background-color: #2E7D32;
+            color: #FFFFFF;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 45px;
+            font-family: 'Sarabun', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .btn-pay:hover {
+            background-color: #1B5E20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-pay:disabled {
+            background-color: #CCCCCC;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-delete {
+            background-color: #D32F2F;
+            color: #FFFFFF;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 45px;
+            font-family: 'Sarabun', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .btn-delete:hover {
+            background-color: #B71C1C;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (min-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .summary-value {
+                font-size: 42px;
+            }
+
+            .form-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .button-group {
+                grid-template-columns: auto auto;
+                justify-content: flex-end;
+            }
+
+            .btn-primary {
+                grid-column: auto;
+                width: auto;
+                padding: 16px 40px;
+            }
+
+            .items-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .item-details {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding: 32px;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .form-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .items-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .item-details {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* ===== Alert Messages ===== */
+        .alert {
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background-color: var(--color-success-light);
+            color: #1B5E20;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .alert-error {
+            background-color: #FFEBEE;
+            color: #C62828;
+            border-left: 4px solid var(--color-danger);
+        }
+
+        .alert-loading {
+            background-color: #E3F2FD;
+            color: var(--color-info);
+            border-left: 4px solid var(--color-info);
+        }
+
+        /* ===== Loading Spinner ===== */
+        .spinner {
+            border: 3px solid #F3F3F3;
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💳 บัตรเครดิต ผ่อนชำระ</h1>
+            <p>จัดการการผ่อนชำระบัตรเครดิตและติดตามความคืบหน้า</p>
+        </div>
 
-  <!-- Loading Screen -->
-  <div id="loading">
-    <div class="spinner"></div>
-    <div id="loading-text">กำลังโหลดข้อมูล...</div>
-  </div>
+        <!-- Alert -->
+        <div id="alert" class="alert"></div>
 
-  <div class="container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h1>ระบบการจัดการการผ่อนชำระ </h1>
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="summary-box">
+                <div class="summary-label">💰 ยอดที่ต้องจ่ายเดือนนี้</div>
+                <div class="summary-value" id="monthlyPayment">0 บ.</div>
+            </div>
+            <div class="summary-box danger">
+                <div class="summary-label">📊 หนี้คงเหลือทั้งหมด</div>
+                <div class="summary-value" id="totalDebt">0 บ.</div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <h2>📝 บันทึกรายการผ่อนชำระใหม่</h2>
+            <form id="addForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อรายการ (เช่น โน้ตบุ๊ก, เก้าอี้)</label>
+                        <input type="text" id="itemName" class="form-input" placeholder="กรอกชื่อสินค้า" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ธนาคารเจ้าของบัตร</label>
+                        <select id="bankName" class="form-select" required>
+                            <option value="">-- เลือกธนาคาร --</option>
+                            <option value="กสิกร">ธนาคารกสิกร</option>
+                            <option value="ไทยพาณิชย์">ธนาคารไทยพาณิชย์</option>
+                            <option value="กรุงเทพ">ธนาคารกรุงเทพ</option>
+                            <option value="กรุงไทย">ธนาคารกรุงไทย</option>
+                            <option value="ธนาคารอื่น">ธนาคารอื่น</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ผ่อนเดือนละ (บาท)</label>
+                        <input type="number" id="monthlyAmount" class="form-input" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">เหลืออีกกี่เดือน</label>
+                        <input type="number" id="months" class="form-input" placeholder="0" required>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="reset" class="btn btn-reset">ล้างข้อมูล</button>
+                    <button type="submit" class="btn btn-primary">บันทึกรายการ</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Items List -->
+        <div class="items-section">
+            <h2>📋 รายการผ่อนชำระทั้งหมด</h2>
+            <div id="itemsList" class="items-grid">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p>ยังไม่มีรายการ บันทึกรายการแรกของคุณเลย!</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Dashboard -->
-    <div class="dashboard">
-      <div class="stat-card">
-        <div class="stat-title">ต้องจ่ายเดือนนี้</div>
-        <div class="stat-value" id="totalMonthly">0</div>
-        <div class="stat-unit">บาท</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">หนี้คงเหลือทั้งหมด</div>
-        <div class="stat-value" id="totalDebt" style="color: #d32f2f;">0</div>
-        <div class="stat-unit">บาท</div>
-      </div>
-    </div>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5iPKAtTFXCAAjLv20f4FlnQXXjncJdYSZg0Tn_6xeCUgB9hmfmoPpufvLt2XaTg/exec';
 
-    <!-- Form -->
-    <div class="form-container">
-      <h2><i class="fas fa-plus-circle"></i> เพิ่มรายการใหม่</h2>
-      <form id="addForm" onsubmit="handleFormSubmit(event)">
-        <div class="form-group">
-          <label>ชื่อรายการ</label>
-          <input type="text" name="itemName" required placeholder="เช่น ตู้เย็น">
-        </div>
-        <div class="form-group">
-          <label>ธนาคาร</label>
-          <select name="bankName" required>
-            <option value="" disabled selected>เลือกธนาคาร...</option>
-            <option value="กสิกร">กสิกร (KBank)</option>
-            <option value="ไทยพาณิชย์">ไทยพาณิชย์ (SCB)</option>
-            <option value="กรุงเทพ">กรุงเทพ (BBL)</option>
-            <option value="กรุงศรี">กรุงศรี (Krungsri)</option>
-            <option value="KTC">KTC</option>
-            <option value="ttb">ttb</option>
-            <option value="UOB">UOB / Citi</option>
-            <option value="First Choice">First Choice</option>
-            <option value="AEON">AEON</option>
-            <option value="อื่นๆ">อื่นๆ</option>
-          </select>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-          <div class="form-group">
-            <label>ผ่อนงวดละ</label>
-            <input type="number" name="monthlyAmount" required min="1">
+        // Utility Functions
+
+  const showAlert = (message, type = 'success') => {
+    const alertEl = document.getElementById('alert');
+    alertEl.className = `alert alert-${type} show`;
+    alertEl.textContent = message;
+    setTimeout(() => alertEl.classList.remove('show'), 4000);
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('th-TH', {
+      style: 'currency',
+      currency: 'THB',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(Number(amount || 0)).replace('฿', '').trim() + ' บ.';
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text ?? '';
+    return div.innerHTML;
+  };
+
+  async function apiGet(action) {
+    const url = `${API_URL}?action=${encodeURIComponent(action)}`;
+    const res = await fetch(url, { method: 'GET' });
+    return await res.json();
+  }
+
+  async function apiPost(action, payload) {
+    const body = new URLSearchParams();
+    body.set('action', action);
+    Object.entries(payload || {}).forEach(([k, v]) => body.set(k, String(v)));
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body
+    });
+
+    return await res.json();
+  }
+
+  const calculateSummary = (items) => {
+    const monthlyPayment = items.reduce((sum, item) => sum + (Number(item.monthlyAmount) || 0), 0);
+    const totalDebt = items.reduce((sum, item) => sum + ((Number(item.monthlyAmount) || 0) * (Number(item.months) || 0)), 0);
+    document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment);
+    document.getElementById('totalDebt').textContent = formatCurrency(totalDebt);
+  };
+
+  const renderItems = (items) => {
+    const listEl = document.getElementById('itemsList');
+    if (!items || items.length === 0) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <p>ยังไม่มีรายการ บันทึกรายการแรกของคุณเลย!</p>
+        </div>`;
+      return;
+    }
+
+    listEl.innerHTML = items.map((item) => {
+      const isCompleted = Number(item.months) === 0;
+      const totalDebt = (Number(item.monthlyAmount) || 0) * (Number(item.months) || 0);
+
+      return `
+        <div class="item-card ${isCompleted ? 'completed' : ''}">
+          <div class="item-header">
+            <div class="item-title">${escapeHtml(item.itemName)}</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="item-bank">${escapeHtml(item.bankName)}</span>
+              ${isCompleted ? '<span class="item-status">✓ ผ่อนหมดแล้ว</span>' : ''}
+            </div>
           </div>
-          <div class="form-group">
-            <label>เหลือ (งวด)</label>
-            <input type="number" name="remainingMonths" required min="1">
+
+          <div class="item-details">
+            <div class="detail-item">
+              <div class="detail-label">ผ่อนเดือนละ</div>
+              <div class="detail-value">${formatCurrency(item.monthlyAmount)}</div>
+            </div>
+            <div class="detail-item detail-highlight">
+              <div class="detail-label">เหลืออีก</div>
+              <div class="detail-value">${Number(item.months)} เดือน</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">หนี้คงเหลือ</div>
+              <div class="detail-value">${formatCurrency(totalDebt)}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">วันที่บันทึก</div>
+              <div class="detail-value">${formatDate(item.timestamp)}</div>
+            </div>
           </div>
-        </div>
-        <button type="submit" class="btn-main">บันทึกรายการ</button>
-      </form>
-    </div>
 
-    <!-- List -->
-    <div id="installmentList"></div>
-  </div>
-
-  <script>
-    /* ======================================================
-       ตั้งค่าการเชื่อมต่อ (อัปเดตเรียบร้อย)
-       ====================================================== */
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx8S1yg93r80fM2l2ZCH_Jwk1ABEmKYYdDRX8Xn1NM3EGVUo2oCrMqqXnx1wEGjK84/exec"; 
-    
-    // --- เริ่มต้นทำงาน ---
-    window.onload = function() {
-      if (!WEB_APP_URL) {
-        alert("ไม่พบ URL ของ Google Apps Script");
-        return;
-      }
-      loadData();
-    };
-
-    function showLoading(show, text="กำลังประมวลผล...") {
-      const el = document.getElementById('loading');
-      document.getElementById('loading-text').innerText = text;
-      el.style.display = show ? 'flex' : 'none';
-    }
-
-    // --- เชื่อมต่อ API ---
-    // ใช้เทคนิค text/plain เพื่อเลี่ยง CORS preflight
-    async function callAPI(action, payload = {}) {
-      const url = `${WEB_APP_URL}`;
-      
-      // ถ้าเป็นการอ่านข้อมูล ใช้ GET
-      if (action === 'read') {
-        const response = await fetch(`${url}?action=read`);
-        return await response.json();
-      } 
-      
-      // ถ้าเป็นการแก้ไขข้อมูล ใช้ POST
-      else {
-        payload.action = action;
-        const response = await fetch(url, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        return await response.json();
-      }
-    }
-
-    // --- โหลดข้อมูล ---
-    async function loadData() {
-      showLoading(true, "กำลังดึงข้อมูลจาก Sheet...");
-      try {
-        const res = await callAPI('read');
-        if (res.status === 'success') {
-          renderPage(res.data);
-        } else {
-          console.error(res);
-          alert('เกิดข้อผิดพลาด: ' + (res.message || 'Unknown error'));
-        }
-      } catch (err) {
-        console.error(err);
-        alert('เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบ URL หรือ Internet');
-      }
-      showLoading(false);
-    }
-
-    // --- แสดงผล ---
-    function renderPage(data) {
-      const listContainer = document.getElementById('installmentList');
-      listContainer.innerHTML = '';
-      
-      let totalMonthly = 0;
-      let totalDebt = 0;
-
-      if (!data || data.length === 0) {
-        listContainer.innerHTML = '<div style="text-align:center; color:#888;">ยังไม่มีรายการ</div>';
-        updateDash(0,0);
-        return;
-      }
-
-      data.forEach(item => {
-        if (item.remaining_months > 0) {
-          totalMonthly += Number(item.monthly_amount);
-          totalDebt += (Number(item.monthly_amount) * Number(item.remaining_months));
-        }
-
-        const isPaid = item.remaining_months <= 0;
-        const card = document.createElement('div');
-        card.className = `card ${isPaid ? 'paid-off' : ''}`;
-        card.innerHTML = `
-          <div class="card-header">${item.item_name}</div>
-          <div class="card-sub">${item.bank_name}</div>
-          <div class="card-stat">
-            <div><small>งวดละ</small><br><strong>${Number(item.monthly_amount).toLocaleString()}</strong></div>
-            <div style="text-align:right;"><small>เหลือ</small><br>${isPaid ? '<span class="paid-badge">หมดแล้ว</span>' : `<span class="remaining-badge">${item.remaining_months}</span> งวด`}</div>
+          <div class="item-actions">
+            <button class="btn-pay" onclick="payInstallment(${item.rowId})" ${isCompleted ? 'disabled' : ''}>
+              ${isCompleted ? '✓ ผ่อนหมดแล้ว' : '✓ จ่ายงวดนี้'}
+            </button>
+            <button class="btn-delete" onclick="deleteItem(${item.rowId})">🗑 ลบรายการ</button>
           </div>
-          ${!isPaid ? `<button class="btn-pay" onclick="doAction('pay', '${item.id}')">จ่ายงวดนี้</button>` : ''}
-          <button class="btn-delete" onclick="doAction('delete', '${item.id}')">ลบรายการ</button>
-        `;
-        listContainer.appendChild(card);
-      });
-      updateDash(totalMonthly, totalDebt);
-    }
+        </div>`;
+    }).join('');
+  };
 
-    function updateDash(m, d) {
-      document.getElementById('totalMonthly').innerText = m.toLocaleString();
-      document.getElementById('totalDebt').innerText = d.toLocaleString();
+  async function loadData() {
+    try {
+      const data = await apiGet('getData');
+      if (!data.success) throw new Error(data.message || 'โหลดข้อมูลไม่สำเร็จ');
+      renderItems(data.items);
+      calculateSummary(data.items);
+    } catch (err) {
+      showAlert('โหลดข้อมูลไม่ได้: ' + err.message, 'error');
     }
+  }
 
-    // --- Action (Add/Pay/Delete) ---
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = {
-        itemName: form.itemName.value,
-        bankName: form.bankName.value,
-        monthlyAmount: form.monthlyAmount.value,
-        remainingMonths: form.remainingMonths.value
+  document.getElementById('addForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        itemName: document.getElementById('itemName').value,
+        bankName: document.getElementById('bankName').value,
+        monthlyAmount: document.getElementById('monthlyAmount').value,
+        months: document.getElementById('months').value
       };
+      const res = await apiPost('addData', payload);
+      if (!res.success) throw new Error(res.message || 'บันทึกไม่สำเร็จ');
 
-      if (confirm('ยืนยันบันทึกรายการ?')) {
-        showLoading(true, "กำลังบันทึกลง Sheet...");
-        await callAPI('add', data);
-        form.reset();
-        await loadData();
-      }
+      showAlert('✓ บันทึกรายการสำเร็จ!', 'success');
+      document.getElementById('addForm').reset();
+      await loadData();
+    } catch (err) {
+      showAlert('บันทึกไม่ได้: ' + err.message, 'error');
     }
+  });
 
-    async function doAction(action, id) {
-      let msg = action === 'pay' ? 'ยืนยันจ่ายงวดนี้?' : 'ยืนยันลบรายการนี้?';
-      if (confirm(msg)) {
-        showLoading(true, "กำลังอัปเดต...");
-        await callAPI(action, { id: id });
-        await loadData();
-      }
+  async function payInstallment(rowId) {
+    if (!confirm('คุณต้องการจ่ายงวดนี้หรือไม่?')) return;
+    try {
+      const res = await apiPost('updateData', { rowId });
+      if (!res.success) throw new Error(res.message || 'จ่ายงวดไม่สำเร็จ');
+
+      showAlert('✓ จ่ายงวดสำเร็จ!', 'success');
+      await loadData();
+    } catch (err) {
+      showAlert('จ่ายงวดไม่ได้: ' + err.message, 'error');
     }
-  </script>
+  }
+
+  async function deleteItem(rowId) {
+    if (!confirm('คุณต้องการลบรายการนี้หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้')) return;
+    try {
+      const res = await apiPost('deleteData', { rowId });
+      if (!res.success) throw new Error(res.message || 'ลบไม่สำเร็จ');
+
+      showAlert('✓ ลบรายการสำเร็จ!', 'success');
+      await loadData();
+    } catch (err) {
+      showAlert('ลบไม่ได้: ' + err.message, 'error');
+    }
+  }
+
+  window.addEventListener('load', loadData);
+</script>
 </body>
 </html>
