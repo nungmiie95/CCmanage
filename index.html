@@ -1,592 +1,282 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบจัดการบัตร</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ระบบการจัดการการผ่อนชำระ </title>
+  
+  <!-- Font & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    /* --- Styles & Variables --- */
+    :root {
+      --bg-color: #FAFAF5; 
+      --text-color: #333333;
+      --card-bg: #FFFFFF;
+      --primary-color: #4A6FA5;
+      --success-color: #4CAF50;
+      --danger-color: #E57373;
+      --border-radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0; padding: 20px; font-size: 18px; line-height: 1.6;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
+    h1, h2, h3 { color: #2c3e50; margin-top: 0; }
+    h2 { font-size: 1.5rem; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    /* Dashboard */
+    .dashboard { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px; }
+    @media (min-width: 768px) { .dashboard { grid-template-columns: 1fr 1fr; body { font-size: 20px; } } }
     
-    <!-- FontAwesome (Icons) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    .stat-card { background: var(--card-bg); padding: 25px; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e0e0e0; }
+    .stat-title { font-size: 1.1rem; color: #666; }
+    .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin: 10px 0; }
+    .stat-unit { font-size: 1rem; color: #888; }
     
-    <!-- Google Fonts: Prompt (Thai Font) -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    /* Form */
+    .form-container { background: var(--card-bg); padding: 25px; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 40px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    input, select { width: 100%; padding: 15px; font-size: 1.1rem; border: 2px solid #ccc; border-radius: 8px; font-family: 'Sarabun', sans-serif; background: #fff; }
+    input:focus { border-color: var(--primary-color); outline: none; }
     
-    <!-- SweetAlert2 (Popups) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    button { cursor: pointer; font-family: 'Sarabun', sans-serif; border: none; transition: 0.2s; }
+    .btn-main { width: 100%; background-color: var(--primary-color); color: white; font-size: 1.2rem; font-weight: 600; padding: 18px; border-radius: 8px; box-shadow: 0 4px 0 #34517b; }
+    .btn-main:active { transform: translateY(2px); box-shadow: 0 2px 0 #34517b; }
+
+    /* List */
+    #installmentList { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 600px) { #installmentList { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); } }
     
-    <!-- Chart.js (กราฟ) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    .card { background: var(--card-bg); padding: 20px; border-radius: var(--border-radius); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 8px solid var(--primary-color); position: relative; }
+    .card.paid-off { border-left-color: var(--success-color); background-color: #f9fff9; opacity: 0.9; }
+    .card-header { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+    .card-sub { color: #666; margin-bottom: 15px; font-size: 1rem; }
+    
+    .card-stat { display: flex; justify-content: space-between; align-items: center; background: #f0f4f8; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; }
+    .remaining-badge { font-size: 1.2rem; font-weight: 700; color: #d32f2f; }
+    .paid-badge { color: var(--success-color); font-weight: bold; }
+    
+    .btn-pay { width: 100%; background-color: var(--success-color); color: white; padding: 15px; font-size: 1.1rem; border-radius: 8px; margin-bottom: 10px; font-weight: 600; }
+    .btn-delete { width: 100%; background: transparent; border: 2px solid #ddd; color: #888; padding: 10px; border-radius: 8px; font-size: 1rem; }
+    .btn-delete:hover { border-color: var(--danger-color); color: var(--danger-color); background: #fff5f5; }
 
-    <!-- Tailwind Config -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Prompt', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#2563EB', // Blue 600
-                        secondary: '#16A34A', // Green 600
-                        danger: '#DC2626', // Red 600
-                        bgLight: '#F3F4F6', 
-                        textDark: '#1F2937', 
-                    },
-                    fontSize: {
-                        'base': '1.125rem', // 18px
-                        'lg': '1.25rem', // 20px
-                        'xl': '1.5rem', // 24px
-                        '2xl': '1.875rem', // 30px
-                        '3xl': '2.25rem', // 36px
-                        '4xl': '3rem', // 48px
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            -webkit-tap-highlight-color: transparent;
-            font-size: 18px;
-        }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .fade-enter { animation: fadeInvoke 0.3s ease-out forwards; }
-        @keyframes fadeInvoke {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-big {
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s;
-        }
-        .btn-big:active { transform: scale(0.98); }
-
-        .clean-card {
-            background-color: white;
-            border: 1px solid #E5E7EB;
-            border-radius: 1.25rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .dark .clean-card {
-            background-color: #1F2937;
-            border-color: #374151;
-        }
-
-        .progress-bar-thick {
-            height: 1rem;
-            border-radius: 9999px;
-            background-color: #E5E7EB;
-            overflow: hidden;
-        }
-        .dark .progress-bar-thick { background-color: #374151; }
-    </style>
+    /* Loading */
+    #loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--primary-color); z-index: 999; display: none; flex-direction: column; }
+    .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
 </head>
-<body class="bg-[#F3F4F6] dark:bg-[#111827] text-textDark dark:text-gray-100 transition-colors duration-200 min-h-screen pb-32 md:pb-0">
+<body>
 
-    <!-- Configuration -->
-    <script>
-        const CONFIG = {
-            // !!! แก้ไข URL ของ Google Apps Script ตรงนี้ !!!
-            API_URL: 'https://script.google.com/macros/s/AKfycbz...YOUR_SCRIPT_URL_HERE.../exec'
-        };
-    </script>
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <div id="loading-text">กำลังโหลดข้อมูล...</div>
+  </div>
 
-    <div class="max-w-3xl mx-auto min-h-screen relative bg-white dark:bg-[#111827] shadow-xl flex flex-col">
-        
-        <!-- Header -->
-        <header class="px-6 py-6 flex justify-between items-center bg-white dark:bg-[#1F2937] border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-            <div>
-                <h1 class="text-2xl font-bold text-primary dark:text-blue-400">
-                    <i class="fas fa-wallet mr-2"></i>ระบบผ่อนชำระ
-                </h1>
-            </div>
-            <button id="themeToggle" class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 text-xl border border-gray-200 dark:border-gray-600">
-                <i class="fas fa-moon dark:hidden"></i>
-                <i class="fas fa-sun hidden dark:block"></i>
-            </button>
-        </header>
-
-        <!-- Loading Overlay -->
-        <div id="loading" class="hidden fixed inset-0 bg-white/90 dark:bg-black/90 z-[60] flex flex-col items-center justify-center">
-            <div class="animate-spin rounded-full h-16 w-16 border-[6px] border-primary border-t-transparent mb-6"></div>
-            <p class="text-xl font-medium text-gray-600 dark:text-gray-300 animate-pulse">กำลังโหลดข้อมูล...</p>
-        </div>
-
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6">
-            
-            <!-- 0. Dashboard Page (หน้าภาพรวม - เพิ่มเข้ามาใหม่) -->
-            <section id="page-dashboard" class="page-section fade-enter">
-                
-                <!-- ยอดหนี้รวม (ใหญ่ที่สุด) -->
-                <div class="bg-primary text-white p-8 rounded-[2rem] shadow-xl mb-6 text-center relative overflow-hidden">
-                    <p class="text-xl opacity-90 mb-2">หนี้บัตรเครดิตรวมทุกใบ</p>
-                    <h2 id="dashTotalDebt" class="text-5xl font-bold tracking-tight mb-2">฿0.00</h2>
-                    <p class="text-sm opacity-70">จากบัตรทั้งหมด <span id="dashCardCount">0</span> ใบ</p>
-                    
-                    <!-- Decorative Circle -->
-                    <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
-                    <div class="absolute bottom-[-20px] right-[-20px] w-32 h-32 bg-black opacity-10 rounded-full blur-2xl"></div>
-                </div>
-
-                <!-- 2 กล่องข้อมูล (ผ่อนเดือนนี้ / วงเงินเหลือ) -->
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="clean-card p-4 flex flex-col items-center justify-center text-center border-b-4 border-blue-500">
-                        <i class="fas fa-calendar-check text-3xl text-blue-500 mb-2"></i>
-                        <p class="text-sm text-gray-500">ต้องผ่อนเดือนนี้</p>
-                        <p id="dashMonthlyPay" class="text-xl font-bold text-gray-800 dark:text-white">฿0.00</p>
-                    </div>
-                    <div class="clean-card p-4 flex flex-col items-center justify-center text-center border-b-4 border-green-500">
-                        <i class="fas fa-wallet text-3xl text-green-500 mb-2"></i>
-                        <p class="text-sm text-gray-500">วงเงินคงเหลือ</p>
-                        <p id="dashAvailable" class="text-xl font-bold text-gray-800 dark:text-white">฿0.00</p>
-                    </div>
-                </div>
-
-                <!-- Chart Section -->
-                <div class="clean-card p-6 mb-6">
-                    <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4 text-center">สุขภาพทางการเงิน</h3>
-                    <div class="h-64 relative">
-                        <canvas id="financeChart"></canvas>
-                    </div>
-                    <div class="flex justify-center mt-4 space-x-6 text-sm">
-                        <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>ใช้ไปแล้ว</div>
-                        <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>วงเงินเหลือ</div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- 1. Installments Page (หน้าผ่อน) -->
-            <section id="page-installments" class="page-section hidden fade-enter">
-                
-                <h2 class="text-2xl font-bold mb-4 px-2">รายการผ่อนชำระ</h2>
-
-                <!-- Add Button -->
-                <button onclick="openModal('installmentModal')" class="w-full btn-big bg-white dark:bg-[#1F2937] border-2 border-dashed border-primary text-primary dark:text-blue-400 mb-6 hover:bg-blue-50 dark:hover:bg-gray-800">
-                    <i class="fas fa-plus-circle text-2xl mr-3"></i>
-                    <span class="text-lg">เพิ่มรายการผ่อนใหม่</span>
-                </button>
-
-                <!-- Active Installments List -->
-                <div id="installmentsList" class="space-y-4">
-                    <!-- รายการจะถูกใส่ที่นี่ -->
-                </div>
-            </section>
-
-            <!-- 2. Payment Page (หน้าจ่ายเงิน) -->
-            <section id="page-payment" class="page-section hidden fade-enter">
-                <h2 class="text-2xl font-bold mb-6 text-center">สแกนจ่ายบิล</h2>
-                
-                <div class="clean-card p-6">
-                    <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">1. เลือกบัตรที่จะจ่าย</label>
-                    <div class="relative mb-8">
-                        <select id="payCardSelect" onchange="updatePayInfo()" class="w-full h-16 pl-4 pr-10 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-xl font-medium focus:border-primary focus:ring-0 appearance-none text-textDark dark:text-white">
-                            <option value="">-- แตะเพื่อเลือกบัตร --</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500"><i class="fas fa-chevron-down text-xl"></i></div>
-                    </div>
-
-                    <div id="paymentContent" class="hidden">
-                        <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-xl mb-6 border border-blue-100 dark:border-gray-700">
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-gray-600 dark:text-gray-400">ยอดหนี้ในระบบ</span>
-                                <span id="payFull" class="text-2xl font-bold text-primary">฿0.00</span>
-                            </div>
-                            <div class="flex justify-between items-end">
-                                <span class="text-gray-600 dark:text-gray-400">ขั้นต่ำ (10%)</span>
-                                <span id="payMin" class="text-lg font-bold text-orange-600">฿0.00</span>
-                            </div>
-                        </div>
-
-                        <div class="mb-6 text-center">
-                            <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">2. สแกน QR Code นี้</label>
-                            <div id="qrImageContainer" class="hidden">
-                                <img id="savedQrImage" src="" alt="QR Code" class="mx-auto w-full max-w-[280px] h-auto rounded-xl border-4 border-gray-200 dark:border-gray-600 shadow-md">
-                                <p class="mt-3 text-lg text-primary font-medium"><i class="fas fa-camera mr-2"></i>เปิดแอปธนาคารสแกนได้เลย</p>
-                            </div>
-                            <div id="noQrMessage" class="hidden py-8 bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
-                                <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
-                                <p class="text-gray-500 text-lg">บัตรนี้ยังไม่มีรูป QR</p>
-                                <button onclick="showPage('page-cards')" class="mt-2 text-primary text-lg font-bold underline">ไปเพิ่มรูปที่เมนู 'บัตร'</button>
-                            </div>
-                        </div>
-
-                        <form onsubmit="handleSubmitPayment(event)" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <div>
-                                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">3. ระบุยอดที่จ่ายจริง (บาท)</label>
-                                <input type="number" id="payAmountInput" step="0.01" class="w-full h-16 text-center text-3xl font-bold text-primary bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-primary focus:ring-0" placeholder="0.00" required>
-                            </div>
-                            <button type="submit" class="w-full h-16 bg-green-600 hover:bg-green-700 text-white text-xl font-bold rounded-xl shadow-lg flex items-center justify-center mt-4">
-                                <i class="fas fa-check-circle mr-3"></i> บันทึกว่าจ่ายแล้ว
-                            </button>
-                        </form>
-                    </div>
-
-                    <div id="paymentEmptyState" class="text-center py-10 text-gray-400">
-                        <i class="fas fa-arrow-up text-4xl mb-3 animate-bounce"></i>
-                        <p class="text-xl">กรุณาเลือกบัตรด้านบนก่อนครับ</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. Cards Page (จัดการบัตร) -->
-            <section id="page-cards" class="page-section hidden fade-enter">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">บัตรทั้งหมด</h2>
-                    <button onclick="openModal('cardModal')" class="bg-primary text-white px-4 py-2 rounded-lg font-bold shadow-md active:scale-95 transition-transform">
-                        <i class="fas fa-plus mr-2"></i>เพิ่มบัตร
-                    </button>
-                </div>
-                <div id="cardsList" class="space-y-6"></div>
-            </section>
-
-        </main>
-
-        <!-- Bottom Navigation (4 ปุ่ม) -->
-        <nav class="bg-white dark:bg-[#1F2937] border-t-2 border-gray-200 dark:border-gray-700 fixed bottom-0 w-full max-w-3xl z-50 pb-safe">
-            <div class="flex justify-around items-center h-20">
-                <!-- Dashboard -->
-                <button onclick="showPage('page-dashboard')" class="nav-btn w-1/4 h-full flex flex-col items-center justify-center text-gray-400 hover:text-primary active:text-primary transition-colors">
-                    <i class="fas fa-chart-pie text-2xl mb-1"></i>
-                    <span class="text-sm font-bold">ภาพรวม</span>
-                </button>
-
-                <!-- Installments -->
-                <button onclick="showPage('page-installments')" class="nav-btn w-1/4 h-full flex flex-col items-center justify-center text-gray-400 hover:text-primary active:text-primary transition-colors border-l border-gray-100 dark:border-gray-700">
-                    <i class="fas fa-calendar-check text-2xl mb-1"></i>
-                    <span class="text-sm font-bold">รายการผ่อน</span>
-                </button>
-                
-                <!-- Scan -->
-                <button onclick="showPage('page-payment')" class="nav-btn w-1/4 h-full flex flex-col items-center justify-center text-gray-400 hover:text-primary active:text-primary transition-colors border-l border-gray-100 dark:border-gray-700">
-                    <i class="fas fa-qrcode text-2xl mb-1"></i>
-                    <span class="text-sm font-bold">สแกนจ่าย</span>
-                </button>
-                
-                <!-- Cards -->
-                <button onclick="showPage('page-cards')" class="nav-btn w-1/4 h-full flex flex-col items-center justify-center text-gray-400 hover:text-primary active:text-primary transition-colors border-l border-gray-100 dark:border-gray-700">
-                    <i class="fas fa-credit-card text-2xl mb-1"></i>
-                    <span class="text-sm font-bold">บัตรเครดิต</span>
-                </button>
-            </div>
-        </nav>
-
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1>จัดการผ่อนชำระ (Google Sheets)</h1>
     </div>
 
-    <!-- Modals -->
-
-    <!-- Modal: เพิ่มรายการผ่อน -->
-    <div id="installmentModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-[#1F2937] w-full max-w-lg rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6 pb-4 border-b dark:border-gray-700">
-                <h3 class="text-2xl font-bold dark:text-white">สร้างรายการผ่อนใหม่</h3>
-                <button onclick="closeModal('installmentModal')" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-white text-xl flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            <form onsubmit="handleAddInstallment(event)" class="space-y-5">
-                <div><label class="block text-lg font-bold mb-2">ผ่อนด้วยบัตรใบไหน?</label><select name="CardID" id="instCardSelect" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg" required><option value="">-- เลือกบัตร --</option></select></div>
-                <div><label class="block text-lg font-bold mb-2">ชื่อสินค้า / รายการ</label><input type="text" name="ItemName" placeholder="เช่น ทีวี, ตู้เย็น" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg" required></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-lg font-bold mb-2">ราคารวม (บาท)</label><input type="number" name="TotalAmount" id="instTotal" placeholder="0" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg text-center" required oninput="calcMonthly()"></div>
-                    <div><label class="block text-lg font-bold mb-2">กี่เดือน?</label><input type="number" name="Months" id="instMonths" placeholder="10" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg text-center" required oninput="calcMonthly()"></div>
-                </div>
-                <div><label class="block text-lg font-bold mb-2">เริ่มผ่อนวันที่</label><input type="date" name="StartDate" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg text-center" required></div>
-                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-center border-2 border-blue-200 dark:border-blue-800"><p class="text-gray-600 dark:text-gray-300 mb-1">ต้องจ่ายเดือนละ</p><div class="relative"><input type="number" name="MonthlyAmount" id="instMonthly" class="w-full bg-transparent text-3xl font-bold text-primary text-center border-none focus:ring-0 p-0" placeholder="0.00" step="0.01" required><span class="text-primary font-bold ml-1">บาท</span></div></div>
-                <input type="hidden" name="Status" value="Active">
-                <button type="submit" class="w-full h-16 bg-primary text-white text-xl font-bold rounded-xl shadow-lg mt-4">บันทึกรายการ</button>
-            </form>
-        </div>
+    <!-- Dashboard -->
+    <div class="dashboard">
+      <div class="stat-card">
+        <div class="stat-title">ต้องจ่ายเดือนนี้</div>
+        <div class="stat-value" id="totalMonthly">0</div>
+        <div class="stat-unit">บาท</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">หนี้คงเหลือทั้งหมด</div>
+        <div class="stat-value" id="totalDebt" style="color: #d32f2f;">0</div>
+        <div class="stat-unit">บาท</div>
+      </div>
     </div>
 
-    <!-- Modal: เพิ่มบัตร -->
-    <div id="cardModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-[#1F2937] w-full max-w-lg rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6 pb-4 border-b dark:border-gray-700">
-                <h3 class="text-2xl font-bold dark:text-white">เพิ่มบัตรใบใหม่</h3>
-                <button onclick="closeModal('cardModal')" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-white text-xl flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            <form onsubmit="handleAddCard(event)" class="space-y-5">
-                <div><label class="block text-lg font-bold mb-2">ชื่อบัตร (ที่จำง่าย)</label><input type="text" name="CardName" placeholder="เช่น กสิกร ใบหลัก" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg" required></div>
-                <div><label class="block text-lg font-bold mb-2">ธนาคาร</label><input type="text" name="BankName" placeholder="เช่น KBank, SCB" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg" required></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-lg font-bold mb-2">วงเงินบัตร</label><input type="number" name="CreditLimit" placeholder="0" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg" required></div>
-                    <div><label class="block text-lg font-bold mb-2">ยอดหนี้เดิม</label><input type="number" name="CurrentBalance" value="0" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg"></div>
-                </div>
-                <div><label class="block text-lg font-bold mb-2">วันตัดรอบบิล (วันที่ 1-31)</label><input type="number" name="DueDate" placeholder="เช่น 25" min="1" max="31" class="w-full h-14 px-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-lg" required></div>
-                <div class="pt-4 border-t dark:border-gray-700">
-                    <label class="block text-lg font-bold mb-3 text-center">รูป QR Code สำหรับจ่ายบิล</label>
-                    <div class="relative w-full h-40 border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onclick="document.getElementById('qrFile').click()">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
-                        <span id="fileNameDisplay" class="text-lg text-gray-500 font-medium px-4 text-center">แตะเพื่อเลือกรูป</span>
-                        <input type="file" id="qrFile" accept="image/*" class="hidden" onchange="updateFileName(this)">
-                    </div>
-                </div>
-                <button type="submit" id="btnSaveCard" class="w-full h-16 bg-primary text-white text-xl font-bold rounded-xl shadow-lg mt-4">บันทึกข้อมูล</button>
-            </form>
+    <!-- Form -->
+    <div class="form-container">
+      <h2><i class="fas fa-plus-circle"></i> เพิ่มรายการใหม่</h2>
+      <form id="addForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label>ชื่อรายการ</label>
+          <input type="text" name="itemName" required placeholder="เช่น ตู้เย็น">
         </div>
+        <div class="form-group">
+          <label>ธนาคาร</label>
+          <select name="bankName" required>
+            <option value="" disabled selected>เลือกธนาคาร...</option>
+            <option value="กสิกร">กสิกร (KBank)</option>
+            <option value="ไทยพาณิชย์">ไทยพาณิชย์ (SCB)</option>
+            <option value="กรุงเทพ">กรุงเทพ (BBL)</option>
+            <option value="กรุงศรี">กรุงศรี (Krungsri)</option>
+            <option value="KTC">KTC</option>
+            <option value="ttb">ttb</option>
+            <option value="UOB">UOB / Citi</option>
+            <option value="First Choice">First Choice</option>
+            <option value="AEON">AEON</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+          </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label>ผ่อนงวดละ</label>
+            <input type="number" name="monthlyAmount" required min="1">
+          </div>
+          <div class="form-group">
+            <label>เหลือ (งวด)</label>
+            <input type="number" name="remainingMonths" required min="1">
+          </div>
+        </div>
+        <button type="submit" class="btn-main">บันทึกรายการ</button>
+      </form>
     </div>
 
-    <!-- JavaScript Logic -->
-    <script>
-        let appState = { cards: [], installments: [] };
+    <!-- List -->
+    <div id="installmentList"></div>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            loadData();
-            const dateInputs = document.querySelectorAll('input[type="date"]');
-            dateInputs.forEach(input => input.valueAsDate = new Date());
-            showPage('page-dashboard'); // เริ่มที่ Dashboard
+  <script>
+    /* ======================================================
+       ตั้งค่าการเชื่อมต่อ (อัปเดตเรียบร้อย)
+       ====================================================== */
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx8S1yg93r80fM2l2ZCH_Jwk1ABEmKYYdDRX8Xn1NM3EGVUo2oCrMqqXnx1wEGjK84/exec"; 
+    
+    // --- เริ่มต้นทำงาน ---
+    window.onload = function() {
+      if (!WEB_APP_URL) {
+        alert("ไม่พบ URL ของ Google Apps Script");
+        return;
+      }
+      loadData();
+    };
+
+    function showLoading(show, text="กำลังประมวลผล...") {
+      const el = document.getElementById('loading');
+      document.getElementById('loading-text').innerText = text;
+      el.style.display = show ? 'flex' : 'none';
+    }
+
+    // --- เชื่อมต่อ API ---
+    // ใช้เทคนิค text/plain เพื่อเลี่ยง CORS preflight
+    async function callAPI(action, payload = {}) {
+      const url = `${WEB_APP_URL}`;
+      
+      // ถ้าเป็นการอ่านข้อมูล ใช้ GET
+      if (action === 'read') {
+        const response = await fetch(`${url}?action=read`);
+        return await response.json();
+      } 
+      
+      // ถ้าเป็นการแก้ไขข้อมูล ใช้ POST
+      else {
+        payload.action = action;
+        const response = await fetch(url, {
+          method: 'POST',
+          body: JSON.stringify(payload)
         });
+        return await response.json();
+      }
+    }
 
-        async function callAPI(action, payload = {}) {
-            const loading = document.getElementById('loading');
-            loading.classList.remove('hidden');
-            try {
-                const response = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action, payload }) });
-                const result = await response.json();
-                if (result.status === 'success') return result.data;
-                else throw new Error(result.message);
-            } catch (error) {
-                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: error.message, confirmButtonText: 'ตกลง' });
-                return null;
-            } finally { loading.classList.add('hidden'); }
+    // --- โหลดข้อมูล ---
+    async function loadData() {
+      showLoading(true, "กำลังดึงข้อมูลจาก Sheet...");
+      try {
+        const res = await callAPI('read');
+        if (res.status === 'success') {
+          renderPage(res.data);
+        } else {
+          console.error(res);
+          alert('เกิดข้อผิดพลาด: ' + (res.message || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบ URL หรือ Internet');
+      }
+      showLoading(false);
+    }
+
+    // --- แสดงผล ---
+    function renderPage(data) {
+      const listContainer = document.getElementById('installmentList');
+      listContainer.innerHTML = '';
+      
+      let totalMonthly = 0;
+      let totalDebt = 0;
+
+      if (!data || data.length === 0) {
+        listContainer.innerHTML = '<div style="text-align:center; color:#888;">ยังไม่มีรายการ</div>';
+        updateDash(0,0);
+        return;
+      }
+
+      data.forEach(item => {
+        if (item.remaining_months > 0) {
+          totalMonthly += Number(item.monthly_amount);
+          totalDebt += (Number(item.monthly_amount) * Number(item.remaining_months));
         }
 
-        async function loadData() {
-            const [cards, installs] = await Promise.all([callAPI('getCards'), callAPI('getInstallments')]);
-            if (cards) appState.cards = cards;
-            if (installs) appState.installments = installs;
-            renderAll();
-        }
+        const isPaid = item.remaining_months <= 0;
+        const card = document.createElement('div');
+        card.className = `card ${isPaid ? 'paid-off' : ''}`;
+        card.innerHTML = `
+          <div class="card-header">${item.item_name}</div>
+          <div class="card-sub">${item.bank_name}</div>
+          <div class="card-stat">
+            <div><small>งวดละ</small><br><strong>${Number(item.monthly_amount).toLocaleString()}</strong></div>
+            <div style="text-align:right;"><small>เหลือ</small><br>${isPaid ? '<span class="paid-badge">หมดแล้ว</span>' : `<span class="remaining-badge">${item.remaining_months}</span> งวด`}</div>
+          </div>
+          ${!isPaid ? `<button class="btn-pay" onclick="doAction('pay', '${item.id}')">จ่ายงวดนี้</button>` : ''}
+          <button class="btn-delete" onclick="doAction('delete', '${item.id}')">ลบรายการ</button>
+        `;
+        listContainer.appendChild(card);
+      });
+      updateDash(totalMonthly, totalDebt);
+    }
 
-        function renderAll() {
-            renderDashboard();
-            renderInstallments();
-            renderCards();
-            populateCardSelects();
-        }
+    function updateDash(m, d) {
+      document.getElementById('totalMonthly').innerText = m.toLocaleString();
+      document.getElementById('totalDebt').innerText = d.toLocaleString();
+    }
 
-        // --- Render Dashboard ---
-        function renderDashboard() {
-            let totalDebt = 0;
-            let totalLimit = 0;
-            let monthlyPay = 0;
-            const today = new Date();
+    // --- Action (Add/Pay/Delete) ---
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        itemName: form.itemName.value,
+        bankName: form.bankName.value,
+        monthlyAmount: form.monthlyAmount.value,
+        remainingMonths: form.remainingMonths.value
+      };
 
-            appState.cards.forEach(card => {
-                totalDebt += parseFloat(card.CurrentBalance) || 0;
-                totalLimit += parseFloat(card.CreditLimit) || 0;
-            });
+      if (confirm('ยืนยันบันทึกรายการ?')) {
+        showLoading(true, "กำลังบันทึกลง Sheet...");
+        await callAPI('add', data);
+        form.reset();
+        await loadData();
+      }
+    }
 
-            // Calc Monthly Pay
-            appState.installments.forEach(inst => {
-                const start = new Date(inst.StartDate);
-                let monthsPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
-                if (today.getDate() >= start.getDate()) monthsPassed++;
-                if (monthsPassed > 0 && monthsPassed <= inst.Months) monthlyPay += parseFloat(inst.MonthlyAmount);
-            });
-
-            const available = totalLimit - totalDebt;
-
-            document.getElementById('dashTotalDebt').innerText = formatCurrency(totalDebt);
-            document.getElementById('dashCardCount').innerText = appState.cards.length;
-            document.getElementById('dashMonthlyPay').innerText = formatCurrency(monthlyPay);
-            document.getElementById('dashAvailable').innerText = formatCurrency(available);
-
-            // Render Chart
-            const ctx = document.getElementById('financeChart').getContext('2d');
-            if (window.financeChartInstance) window.financeChartInstance.destroy();
-
-            // สีเขียว (ว่าง) / แดง (ใช้) แบบชัดๆ
-            const data = {
-                labels: ['หนี้สิน (ใช้ไป)', 'วงเงินคงเหลือ'],
-                datasets: [{
-                    data: [totalDebt, available < 0 ? 0 : available],
-                    backgroundColor: ['#EF4444', '#22C55E'],
-                    borderWidth: 0
-                }]
-            };
-
-            window.financeChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: function(c) { return ' ' + formatCurrency(c.raw); } } }
-                    },
-                    cutout: '70%'
-                }
-            });
-        }
-
-        function renderInstallments() {
-            const container = document.getElementById('installmentsList');
-            container.innerHTML = '';
-            const today = new Date();
-
-            if (appState.installments.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 bg-white dark:bg-gray-800 rounded-3xl border-2 border-dashed border-gray-300 dark:border-gray-700"><i class="fas fa-check-circle text-6xl text-gray-300 mb-4"></i><p class="text-xl text-gray-500">ไม่มีรายการผ่อน</p></div>`;
-            } else {
-                const sortedInst = [...appState.installments].sort((a, b) => new Date(b.StartDate) - new Date(a.StartDate));
-                sortedInst.forEach(inst => {
-                    const card = appState.cards.find(c => c.CardID == inst.CardID);
-                    const start = new Date(inst.StartDate);
-                    let monthsPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
-                    if (today.getDate() >= start.getDate()) monthsPassed++;
-                    if (monthsPassed < 0) monthsPassed = 0;
-                    if (monthsPassed > inst.Months) monthsPassed = inst.Months;
-                    const remaining = inst.Months - monthsPassed;
-                    const progress = (monthsPassed / inst.Months) * 100;
-                    const isActive = remaining > 0;
-                    const bgClass = isActive ? 'border-primary' : 'border-gray-300 opacity-70';
-
-                    const html = `
-                        <div class="clean-card p-5 border-l-8 ${bgClass}">
-                            <div class="flex justify-between items-start mb-3">
-                                <div><h4 class="text-xl font-bold text-gray-800 dark:text-white">${inst.ItemName}</h4><p class="text-base text-gray-500"><i class="fas fa-credit-card mr-1"></i> ${card ? card.CardName : 'ไม่ระบุ'}</p></div>
-                                <div class="text-right"><p class="text-2xl font-bold text-primary">${formatCurrency(inst.MonthlyAmount)}</p><p class="text-sm text-gray-400">ต่อเดือน</p></div>
-                            </div>
-                            <div class="flex justify-between text-base font-medium mb-1 text-gray-600 dark:text-gray-300"><span>งวดที่ ${monthsPassed} / ${inst.Months}</span><span>เหลือ ${remaining} เดือน</span></div>
-                            <div class="progress-bar-thick mb-4"><div class="h-full bg-secondary transition-all duration-500" style="width: ${progress}%"></div></div>
-                            <div class="flex justify-between items-center border-t pt-3 dark:border-gray-700"><span class="text-sm text-gray-400">เริ่ม: ${start.toLocaleDateString('th-TH')}</span><button onclick="deleteInstallment('${inst.InstallmentID}')" class="text-red-500 font-bold px-3 py-1 rounded hover:bg-red-50"><i class="fas fa-trash-alt mr-1"></i>ลบ</button></div>
-                        </div>`;
-                    container.insertAdjacentHTML('beforeend', html);
-                });
-            }
-        }
-
-        function renderCards() {
-            const container = document.getElementById('cardsList');
-            container.innerHTML = '';
-            if (appState.cards.length === 0) { container.innerHTML = `<div class="text-center text-xl text-gray-400 py-10">ยังไม่มีบัตรเครดิต</div>`; return; }
-
-            appState.cards.forEach(card => {
-                const bal = parseFloat(card.CurrentBalance) || 0;
-                let cardColor = 'bg-gray-700';
-                const name = card.BankName.toLowerCase();
-                if (name.includes('kbank')) cardColor = 'bg-[#00A950]';
-                else if (name.includes('scb')) cardColor = 'bg-[#4E2A84]';
-                else if (name.includes('bbl')) cardColor = 'bg-[#1E3A8A]';
-                else if (name.includes('ktc')) cardColor = 'bg-[#009EDB]';
-                else if (name.includes('ttb')) cardColor = 'bg-[#002D63]';
-
-                const hasQR = card.PaymentQR ? '<span class="bg-white/20 px-2 py-1 rounded text-sm"><i class="fas fa-qrcode mr-1"></i>มี QR</span>' : '<span class="bg-black/20 px-2 py-1 rounded text-sm text-gray-300">ไม่มี QR</span>';
-
-                const html = `
-                    <div class="${cardColor} text-white p-6 rounded-3xl shadow-lg relative overflow-hidden">
-                        <div class="flex justify-between items-start mb-6"><div><h3 class="text-2xl font-bold shadow-black drop-shadow-md">${card.CardName}</h3><p class="text-lg opacity-90">${card.BankName}</p></div>${hasQR}</div>
-                        <div class="flex justify-between items-end"><div><p class="text-sm opacity-80 mb-1">ยอดหนี้ปัจจุบัน</p><p class="text-3xl font-bold">${formatCurrency(bal)}</p></div><div class="text-right"><p class="text-sm opacity-80 mb-1">ตัดรอบวันที่</p><p class="text-2xl font-bold">${card.DueDate}</p></div></div>
-                        <button onclick="deleteCard('${card.CardID}')" class="absolute top-0 right-0 p-4 opacity-50 hover:opacity-100 hover:text-red-300 transition-opacity"><i class="fas fa-trash-alt text-xl"></i></button>
-                    </div>`;
-                container.insertAdjacentHTML('beforeend', html);
-            });
-        }
-
-        // Logic Functions (Same as before)
-        function updatePayInfo() {
-            const c = appState.cards.find(x=>x.CardID==document.getElementById('payCardSelect').value);
-            if(c) {
-                document.getElementById('paymentContent').classList.remove('hidden'); document.getElementById('paymentEmptyState').classList.add('hidden');
-                document.getElementById('payFull').innerText=formatCurrency(c.CurrentBalance); document.getElementById('payMin').innerText=formatCurrency(c.CurrentBalance*0.1); document.getElementById('payAmountInput').value=c.CurrentBalance;
-                if(c.PaymentQR && c.PaymentQR.startsWith('http')) { document.getElementById('qrImageContainer').classList.remove('hidden'); document.getElementById('savedQrImage').src=c.PaymentQR; document.getElementById('noQrMessage').classList.add('hidden'); }
-                else { document.getElementById('qrImageContainer').classList.add('hidden'); document.getElementById('noQrMessage').classList.remove('hidden'); }
-            } else { document.getElementById('paymentContent').classList.add('hidden'); document.getElementById('paymentEmptyState').classList.remove('hidden'); }
-        }
-
-        async function handleSubmitPayment(e) {
-            e.preventDefault();
-            const cardId = document.getElementById('payCardSelect').value; const amount = document.getElementById('payAmountInput').value;
-            if (!cardId || !amount || amount <= 0) return;
-            await callAPI('addPayment', { CardID: cardId, Amount: amount, PaymentDate: new Date().toISOString(), PaymentMethod: 'SavedQR', Status: 'Completed' });
-            document.getElementById('payCardSelect').value = ""; updatePayInfo();
-            Swal.fire({ icon: 'success', title: 'บันทึกการจ่ายสำเร็จ!', text: 'ยอดหนี้ในบัตรลดลงแล้ว', confirmButtonText: 'เยี่ยมมาก', confirmButtonColor: '#16A34A' });
-            loadData();
-        }
-
-        function calcMonthly() {
-            const total = parseFloat(document.getElementById('instTotal').value) || 0;
-            const months = parseFloat(document.getElementById('instMonths').value) || 1;
-            document.getElementById('instMonthly').value = (total / months).toFixed(2);
-        }
-
-        async function handleAddInstallment(e) {
-            e.preventDefault(); const formData = new FormData(e.target);
-            await callAPI('addInstallment', Object.fromEntries(formData.entries()));
-            closeModal('installmentModal'); e.target.reset(); loadData();
-            Swal.fire({ icon: 'success', title: 'เรียบร้อย!', text: 'เพิ่มรายการผ่อนใหม่แล้ว', timer: 1500, showConfirmButton: false });
-        }
-
-        async function deleteInstallment(id) {
-            if((await Swal.fire({ title: 'ลบรายการนี้?', text: 'ลบแล้วกู้คืนไม่ได้', icon: 'warning', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'ลบเลย' })).isConfirmed) {
-                await callAPI('deleteInstallment', { InstallmentID: id }); loadData();
-            }
-        }
-
-        async function handleAddCard(e) {
-            e.preventDefault(); const btn = document.getElementById('btnSaveCard'); const originalText = btn.innerText; btn.innerText = 'กำลังบันทึก...'; btn.disabled = true;
-            const formData = new FormData(e.target); let payload = Object.fromEntries(formData.entries());
-            const fileInput = document.getElementById('qrFile');
-            if (fileInput.files.length > 0) {
-                const b = await toBase64(fileInput.files[0]);
-                const r = await callAPI('uploadImage', { data: b.split(',')[1], type: fileInput.files[0].type, name: fileInput.files[0].name });
-                if (r) payload.PaymentQR = r.url;
-            }
-            await callAPI('addCard', payload);
-            closeModal('cardModal'); e.target.reset(); document.getElementById('fileNameDisplay').innerText = "แตะเพื่อเลือกรูป"; btn.innerText = originalText; btn.disabled = false;
-            loadData(); Swal.fire({ icon: 'success', title: 'เพิ่มบัตรเรียบร้อย', timer: 1500, showConfirmButton: false });
-        }
-
-        async function deleteCard(id) {
-            if((await Swal.fire({ title: 'ลบบัตรใบนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'ลบเลย' })).isConfirmed) {
-                await callAPI('deleteCard', { CardID: id }); loadData();
-            }
-        }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => { el.classList.add('hidden'); el.classList.remove('fade-enter'); });
-            const target = document.getElementById(pageId); target.classList.remove('hidden'); void target.offsetWidth; target.classList.add('fade-enter');
-            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-primary'); btn.classList.add('text-gray-400'); });
-            if (pageId === 'page-dashboard') document.querySelectorAll('.nav-btn')[0].classList.add('text-primary');
-            if (pageId === 'page-installments') document.querySelectorAll('.nav-btn')[1].classList.add('text-primary');
-            if (pageId === 'page-payment') document.querySelectorAll('.nav-btn')[2].classList.add('text-primary');
-            if (pageId === 'page-cards') document.querySelectorAll('.nav-btn')[3].classList.add('text-primary');
-        }
-
-        function populateCardSelects() {
-            const opts = appState.cards.map(c => `<option value="${c.CardID}">${c.CardName}</option>`).join('');
-            const def = '<option value="">-- เลือกบัตร --</option>';
-            document.getElementById('instCardSelect').innerHTML = def + opts;
-            document.getElementById('payCardSelect').innerHTML = def + opts;
-        }
-
-        function updateFileName(input) { document.getElementById('fileNameDisplay').innerText = input.files[0] ? "เลือก: " + input.files[0].name : "แตะเพื่อเลือกรูป"; }
-        function toBase64(f) { return new Promise((r, j) => { const d = new FileReader(); d.readAsDataURL(f); d.onload = () => r(d.result); d.onerror = e => j(e); }); }
-        function formatCurrency(n) { return '฿' + (parseFloat(n) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function initTheme() {
-            const h = document.documentElement;
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) h.classList.add('dark');
-            document.getElementById('themeToggle').addEventListener('click', () => { h.classList.toggle('dark'); localStorage.theme = h.classList.contains('dark') ? 'dark' : 'light'; });
-        }
-    </script>
+    async function doAction(action, id) {
+      let msg = action === 'pay' ? 'ยืนยันจ่ายงวดนี้?' : 'ยืนยันลบรายการนี้?';
+      if (confirm(msg)) {
+        showLoading(true, "กำลังอัปเดต...");
+        await callAPI(action, { id: id });
+        await loadData();
+      }
+    }
+  </script>
 </body>
 </html>
