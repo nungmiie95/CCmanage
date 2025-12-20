@@ -3,760 +3,849 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการผ่อนชำระบัตรเครดิต</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>รายการผ่อนชำระบัตรเครดิต</title>
+    <!-- ใช้ฟอนต์ Sarabun เพื่อความอ่านง่ายภาษาไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --color-bg: #FAFAF5;
-            --color-text: #333333;
-            --color-text-light: #666666;
-            --color-primary: #2E7D32;
-            --color-danger: #D32F2F;
-            --color-info: #0288D1;
-            --color-card-bg: #FFFFFF;
-            --color-border: #E0E0E0;
-            --color-success-light: #E8F5E9;
-            --color-input-bg: #FAFAFA;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
+            --primary-color: #00BFA5; 
+            --primary-dark: #009688;
+            --bg-color: #F5F7FA;       
+            --card-bg: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --danger-color: #E74C3C;
+            --warning-color: #F39C12;
+            --success-color: #2ECC71;
+            --border-color: #E0E0E0;
+            --edit-color: #3498DB;
         }
 
         body {
-            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            font-size: 16px;
-            line-height: 1.6;
-            padding: 0;
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
+            padding: 0;
+            font-size: 16px; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
-            width: 100%;
-            max-width: 1200px;
+            max-width: 600px; 
             margin: 0 auto;
-            padding: 16px;
-        }
-
-        /* ===== Header ===== */
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-            padding: 16px;
-            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
-            color: #FFFFFF;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* ===== Dashboard Summary ===== */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .summary-box {
-            background: var(--color-card-bg);
-            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid var(--color-primary);
+            padding-bottom: 80px; 
         }
 
-        .summary-box.danger {
-            border-left-color: var(--color-danger);
+        /* Responsive Tweaks: ปรับแต่งเพิ่มเติมสำหรับมือถือจอเล็ก */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px; /* ลดขอบด้านข้างลงเล็กน้อยเพื่อให้มีที่ว่างมากขึ้น */
+                padding-bottom: 80px;
+            }
+            header {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.25rem;
+            }
+            .summary-item .value {
+                font-size: 1.15rem; /* ปรับขนาดตัวเลขสรุปยอดไม่ให้ล้นถ้าตัวเลขหลักเยอะ */
+            }
+            .group-title {
+                font-size: 1rem;
+            }
+            .checkbox-wrapper {
+                margin-left: 5px; /* ลดระยะห่าง checkbox */
+            }
         }
 
-        .summary-label {
-            font-size: 14px;
-            color: var(--color-text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .summary-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--color-primary);
-        }
-
-        .summary-box.danger .summary-value {
-            color: var(--color-danger);
-        }
-
-        /* ===== Form Section ===== */
-        .form-section {
-            background: var(--color-card-bg);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .form-section h2 {
-            font-size: 20px;
-            font-weight: 700;
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,191,165,0.3);
             margin-bottom: 20px;
-            color: var(--color-text);
+            text-align: center;
+            position: relative;
         }
 
-        .form-group {
-            margin-bottom: 16px;
+        h1 { margin: 0 0 15px 0; font-size: 1.4rem; font-weight: 600; }
+        
+        .summary-box {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .summary-item { flex: 1; text-align: center; }
+        .summary-item:first-child { border-right: 1px solid rgba(255,255,255,0.2); }
+        .summary-item .label { font-size: 0.85rem; opacity: 0.9; margin-bottom: 4px; }
+        .summary-item .value { font-size: 1.3rem; font-weight: bold; }
+        .summary-item .value.highlight { color: #FFF176; }
+
+        .demo-badge {
+            background-color: #FF9800;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
 
-        .form-label {
-            display: block;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--color-text);
+        /* Group Card Styles */
+        .group-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.2s;
         }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            border: 2px solid var(--color-border);
-            border-radius: 8px;
-            background-color: var(--color-input-bg);
-            color: var(--color-text);
-            font-family: 'Sarabun', sans-serif;
-            transition: border-color 0.3s;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
-        }
-
-        .form-input::placeholder {
-            color: var(--color-text-light);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        /* ===== Buttons ===== */
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 16px 20px;
-            font-size: 18px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
+        
+        /* Group Header (ส่วนหัวที่คลิกได้) */
+        .group-header {
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Sarabun', sans-serif;
-            min-height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            user-select: none;
+        }
+        
+        .group-header:active { background-color: #f9f9f9; }
+
+        .group-info { flex: 1; min-width: 0; /* ป้องกัน text overflow */ }
+        
+        .group-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .group-meta {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap; /* ให้ตกบรรทัดได้ถ้าจอเล็กมาก */
+        }
+
+        .group-badge {
+            background-color: #ECEFF1;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #546E7A;
+            white-space: nowrap;
+        }
+        .group-badge.active { background-color: #E0F2F1; color: var(--primary-dark); }
+        .group-badge.done { background-color: #E8F5E9; color: var(--success-color); }
+
+        /* Actions Area */
+        .group-actions {
+            display: flex;
+            gap: 2px; /* ลดระยะห่างปุ่ม action */
+            align-items: center;
+            margin-left: 5px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
+            transition: background-color 0.2s;
+            color: #999;
+        }
+        .btn-icon:hover { background-color: #f0f0f0; }
+        .btn-icon.edit:hover { color: var(--edit-color); background-color: #EBF5FB; }
+        .btn-icon.delete:hover { color: var(--danger-color); background-color: #FDEDEC; }
+        
+        .chevron {
+            color: #ccc;
+            transition: transform 0.3s;
+            margin-left: 5px;
+            flex-shrink: 0;
+        }
+        .group-card.open .chevron { transform: rotate(180deg); }
+
+        /* Progress Bar */
+        .progress-container {
+            height: 4px;
+            background-color: #F1F1F1;
+            width: 100%;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.5s ease;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: #FFFFFF;
-            grid-column: 1 / -1;
-        }
-
-        .btn-primary:hover {
-            background-color: #1B5E20;
-        }
-
-        .btn-reset {
-            background-color: #9E9E9E;
-            color: #FFFFFF;
-        }
-
-        .btn-reset:hover {
-            background-color: #757575;
-        }
-
-        /* ===== Items List ===== */
-        .items-section {
-            margin-bottom: 24px;
-        }
-
-        .items-section h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--color-text);
-        }
-
-        .items-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .item-card {
-            background: var(--color-card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid var(--color-primary);
-            transition: all 0.3s;
-        }
-
-        .item-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        }
-
-        .item-card.completed {
-            border-top-color: #4CAF50;
-            background: var(--color-success-light);
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 12px;
-        }
-
-        .item-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--color-text);
-            flex: 1;
-        }
-
-        .item-bank {
-            display: inline-block;
-            background-color: var(--color-info);
-            color: #FFFFFF;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .item-status {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: #FFFFFF;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .item-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .detail-item {
-            background-color: var(--color-input-bg);
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 3px solid var(--color-primary);
-        }
-
-        .detail-label {
-            font-size: 12px;
-            color: var(--color-text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .detail-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--color-text);
-        }
-
-        .detail-highlight {
-            border-left-color: #FF9800;
-        }
-
-        .detail-highlight .detail-value {
-            color: #FF9800;
-        }
-
-        .item-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-pay {
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            min-height: 45px;
-            font-family: 'Sarabun', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .btn-pay:hover {
-            background-color: #1B5E20;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
-        }
-
-        .btn-pay:disabled {
-            background-color: #CCCCCC;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-delete {
-            background-color: #D32F2F;
-            color: #FFFFFF;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            min-height: 45px;
-            font-family: 'Sarabun', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .btn-delete:hover {
-            background-color: #B71C1C;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--color-text-light);
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            margin: 0;
-        }
-
-        /* ===== Responsive Design ===== */
-        @media (min-width: 768px) {
-            .container {
-                padding: 24px;
-            }
-
-            .header h1 {
-                font-size: 32px;
-            }
-
-            .dashboard {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .summary-value {
-                font-size: 42px;
-            }
-
-            .form-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .button-group {
-                grid-template-columns: auto auto;
-                justify-content: flex-end;
-            }
-
-            .btn-primary {
-                grid-column: auto;
-                width: auto;
-                padding: 16px 40px;
-            }
-
-            .items-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .item-details {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .container {
-                padding: 32px;
-            }
-
-            .header h1 {
-                font-size: 36px;
-            }
-
-            .form-row {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .items-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .item-details {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        /* ===== Alert Messages ===== */
-        .alert {
-            padding: 16px;
-            margin-bottom: 16px;
-            border-radius: 8px;
+        /* Sub Items */
+        .sub-list {
             display: none;
-            animation: slideIn 0.3s ease-out;
+            background-color: #FAFAFA;
+            border-top: 1px solid var(--border-color);
         }
+        .group-card.open .sub-list { display: block; }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .sub-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #EEEEEE;
         }
+        .sub-item:last-child { border-bottom: none; }
+        
+        .sub-item.paid { background-color: #f0fdf4; }
+        .sub-item.paid .sub-info { opacity: 0.5; text-decoration: line-through; }
 
-        .alert.show {
-            display: block;
-        }
+        .sub-info { flex: 1; display: flex; flex-direction: column; margin-left: 10px; }
+        
+        .sub-month { font-weight: 500; font-size: 0.95rem; }
+        .sub-installment { font-size: 0.8rem; color: #999; margin-left: 5px; }
+        .sub-amount { font-weight: 600; color: var(--danger-color); font-size: 0.95rem; margin-top: 2px;}
+        .sub-item.paid .sub-amount { color: #999; }
 
-        .alert-success {
-            background-color: var(--color-success-light);
-            color: #1B5E20;
-            border-left: 4px solid #4CAF50;
+        /* Checkbox */
+        .checkbox-wrapper {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            flex-shrink: 0;
         }
+        .checkbox-wrapper input { opacity: 0; width: 0; height: 0; }
+        .checkmark {
+            position: absolute;
+            top: 4px; left: 4px;
+            height: 28px; width: 28px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .checkbox-wrapper input:checked ~ .checkmark {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        .checkmark:after {
+            content: "";
+            position: absolute; display: none;
+            left: 9px; top: 5px;
+            width: 6px; height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .checkbox-wrapper input:checked ~ .checkmark:after { display: block; }
 
-        .alert-error {
-            background-color: #FFEBEE;
-            color: #C62828;
-            border-left: 4px solid var(--color-danger);
+        .sub-actions {
+            display: flex;
+            align-items: center;
         }
+        .btn-sub-action {
+            background: none; border: none;
+            color: #ddd; font-size: 1rem;
+            margin-left: 5px; padding: 5px;
+            cursor: pointer;
+        }
+        .btn-sub-action.edit:hover { color: var(--edit-color); }
+        .btn-sub-action.delete:hover { color: var(--danger-color); }
 
-        .alert-loading {
-            background-color: #E3F2FD;
-            color: var(--color-info);
-            border-left: 4px solid var(--color-info);
+        /* FAB Button */
+        .fab-add {
+            position: fixed; bottom: 30px; right: 30px;
+            background-color: var(--primary-dark);
+            color: white; width: 60px; height: 60px;
+            border-radius: 50%; border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 2rem; display: flex;
+            align-items: center; justify-content: center;
+            cursor: pointer; z-index: 99;
         }
+        
+        /* Modal & Tabs */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-content { background-color: white; padding: 0; border-radius: 16px; width: 90%; max-width: 400px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .tab-header { display: flex; background-color: #f5f5f5; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 1rem; color: #666; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background-color: white; font-weight: bold; }
+        .tab-content { padding: 25px; }
+        .hidden { display: none; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background-color: #FAFAFA; }
+        .btn-submit { width: 100%; padding: 14px; background-color: var(--primary-color); color: white; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-cancel { width: 100%; padding: 12px; background: none; border: none; color: #777; margin-top: 10px; cursor: pointer; }
+        #loading { text-align: center; padding: 20px; color: #666; }
+        .empty-state { text-align: center; color: #999; margin-top: 50px; }
 
-        /* ===== Loading Spinner ===== */
-        .spinner {
-            border: 3px solid #F3F3F3;
-            border-top: 3px solid var(--color-primary);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
+        /* SVG Icons */
+        .icon { width: 18px; height: 18px; fill: currentColor; }
+        .icon-sm { width: 16px; height: 16px; fill: currentColor; }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>💳 บัตรเครดิต ผ่อนชำระ</h1>
-            <p>จัดการการผ่อนชำระบัตรเครดิตและติดตามความคืบหน้า</p>
-        </div>
-
-        <!-- Alert -->
-        <div id="alert" class="alert"></div>
-
-        <!-- Dashboard -->
-        <div class="dashboard">
+        <header>
+            <div id="demo-badge" class="demo-badge" style="display:none;">โหมดทดลอง (Demo)</div>
+            <h1>ตารางผ่อนชำระ</h1>
             <div class="summary-box">
-                <div class="summary-label">💰 ยอดที่ต้องจ่ายเดือนนี้</div>
-                <div class="summary-value" id="monthlyPayment">0 บ.</div>
+                <div class="summary-item">
+                    <div class="label">ต้องจ่ายเดือนนี้</div>
+                    <div class="value" id="month-amount">0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">หนี้คงเหลือรวม</div>
+                    <div class="value highlight" id="total-remaining">0</div>
+                </div>
             </div>
-            <div class="summary-box danger">
-                <div class="summary-label">📊 หนี้คงเหลือทั้งหมด</div>
-                <div class="summary-value" id="totalDebt">0 บ.</div>
-            </div>
+        </header>
+
+        <div id="loading">กำลังโหลดข้อมูล...</div>
+        <div id="installment-list">
+            <!-- รายการแบบ Group จะถูกเติมที่นี่ -->
         </div>
 
-        <!-- Form Section -->
-        <div class="form-section">
-            <h2>📝 บันทึกรายการผ่อนชำระใหม่</h2>
-            <form id="addForm">
-                <div class="form-row">
+        <button class="fab-add" onclick="openModal('addModal')">+</button>
+    </div>
+
+    <!-- หน้าต่างเพิ่มรายการ (Add Modal) -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="switchTab('tab-plan')">สร้างตารางผ่อน</button>
+                <button class="tab-btn" onclick="switchTab('tab-single')">เพิ่มทีละงวด</button>
+            </div>
+
+            <!-- Tab 1: สร้างตารางผ่อน -->
+            <div id="tab-plan" class="tab-content">
+                <form onsubmit="handlePlanSubmit(event)">
                     <div class="form-group">
-                        <label class="form-label">ชื่อรายการ (เช่น โน้ตบุ๊ก, เก้าอี้)</label>
-                        <input type="text" id="itemName" class="form-input" placeholder="กรอกชื่อสินค้า" required>
+                        <label>ชื่อรายการ</label>
+                        <input type="text" id="planName" placeholder="เช่น iPhone 15" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">ธนาคารเจ้าของบัตร</label>
-                        <select id="bankName" class="form-select" required>
-                            <option value="">-- เลือกธนาคาร --</option>
-                            <option value="กสิกร">ธนาคารกสิกร</option>
-                            <option value="ไทยพาณิชย์">ธนาคารไทยพาณิชย์</option>
-                            <option value="กรุงเทพ">ธนาคารกรุงเทพ</option>
-                            <option value="กรุงไทย">ธนาคารกรุงไทย</option>
-                            <option value="ธนาคารอื่น">ธนาคารอื่น</option>
+                        <label>ยอดเงินรวมทั้งสิ้น (บาท)</label>
+                        <input type="number" id="planTotal" placeholder="เช่น 30000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนเดือนที่ผ่อน</label>
+                        <select id="planMonths" required>
+                            <option value="3">3 เดือน</option>
+                            <option value="4">4 เดือน</option>
+                            <option value="6">6 เดือน</option>
+                            <option value="10" selected>10 เดือน</option>
+                            <option value="12">12 เดือน</option>
+                            <option value="18">18 เดือน</option>
+                            <option value="24">24 เดือน</option>
+                            <option value="36">36 เดือน</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">ผ่อนเดือนละ (บาท)</label>
-                        <input type="number" id="monthlyAmount" class="form-input" placeholder="0" required>
+                        <label>เริ่มผ่อนเดือนไหน?</label>
+                        <select id="planStartMonth" required></select>
+                    </div>
+                    <button type="submit" class="btn-submit">คำนวณและบันทึก</button>
+                </form>
+                <button type="button" class="btn-cancel" onclick="closeModal('addModal')">ปิดหน้าต่าง</button>
+            </div>
+
+            <!-- Tab 2: เพิ่มทีละงวด -->
+            <div id="tab-single" class="tab-content hidden">
+                <form onsubmit="handleSingleSubmit(event)">
+                    <div class="form-group">
+                        <label>ชื่อรายการ</label>
+                        <input type="text" id="itemName" placeholder="เช่น ค่าประกัน" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">เหลืออีกกี่เดือน</label>
-                        <input type="number" id="months" class="form-input" placeholder="0" required>
+                        <label>รายละเอียดงวด</label>
+                        <input type="text" id="installmentNo" placeholder="เช่น 1/1" required>
                     </div>
-                </div>
-                <div class="button-group">
-                    <button type="reset" class="btn btn-reset">ล้างข้อมูล</button>
-                    <button type="submit" class="btn btn-primary">บันทึกรายการ</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label>จำนวนเงิน (บาท)</label>
+                        <input type="number" step="0.01" id="amount" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>เดือนที่จ่าย</label>
+                        <select id="monthName" required></select>
+                    </div>
+                    <button type="submit" class="btn-submit">บันทึก</button>
+                </form>
+                <button type="button" class="btn-cancel" onclick="closeModal('addModal')">ปิดหน้าต่าง</button>
+            </div>
         </div>
+    </div>
 
-        <!-- Items List -->
-        <div class="items-section">
-            <h2>📋 รายการผ่อนชำระทั้งหมด</h2>
-            <div id="itemsList" class="items-grid">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
-                    <p>ยังไม่มีรายการ บันทึกรายการแรกของคุณเลย!</p>
-                </div>
+    <!-- หน้าต่างแก้ไขงวด (Edit Modal) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="tab-content">
+                <h2 style="margin-top:0;">แก้ไขงวดผ่อน</h2>
+                <form onsubmit="handleEditSubmit(event)">
+                    <input type="hidden" id="editId">
+                    <div class="form-group">
+                        <label>ชื่อรายการ</label>
+                        <input type="text" id="editItemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>รายละเอียดงวด</label>
+                        <input type="text" id="editInstallmentNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนเงิน (บาท)</label>
+                        <input type="number" step="0.01" id="editAmount" required>
+                    </div>
+                    <div class="form-group">
+                        <label>เดือนที่จ่าย</label>
+                        <select id="editMonthName" required></select>
+                    </div>
+                    <button type="submit" class="btn-submit">บันทึกการแก้ไข</button>
+                </form>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">ยกเลิก</button>
             </div>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5iPKAtTFXCAAjLv20f4FlnQXXjncJdYSZg0Tn_6xeCUgB9hmfmoPpufvLt2XaTg/exec';
+        // *** ตั้งค่า URL ของคุณเรียบร้อยแล้ว ***
+        const API_URL = 'https://script.google.com/a/macros/skxdigital.com/s/AKfycbyevejstTT3Wtw2RP6EkwmsY4razTZtGUSPFI7j68fR9z7fsa19GGaqNw0DRqoykWw/exec'; 
+        
+        // ถ้า URL ไม่ใช่ค่าว่าง ระบบจะถือว่าเป็นโหมดจริง (IS_DEMO_MODE = false)
+        const IS_DEMO_MODE = (API_URL === 'YOUR_WEB_APP_URL_HERE' || API_URL === '');
+        const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        // Icons
+        const ICON_EDIT = `<svg class="icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+        const ICON_TRASH = `<svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
+        const ICON_EDIT_SM = `<svg class="icon-sm" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+        const ICON_TRASH_SM = `<svg class="icon-sm" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
 
-        // Utility Functions
+        let installmentsData = [];
 
-  const showAlert = (message, type = 'success') => {
-    const alertEl = document.getElementById('alert');
-    alertEl.className = `alert alert-${type} show`;
-    alertEl.textContent = message;
-    setTimeout(() => alertEl.classList.remove('show'), 4000);
-  };
+        document.addEventListener('DOMContentLoaded', () => {
+            initMonthSelects();
+            if (IS_DEMO_MODE) {
+                document.getElementById('demo-badge').style.display = 'block';
+            }
+            fetchData();
+        });
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('th-TH', {
-      style: 'currency',
-      currency: 'THB',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(Number(amount || 0)).replace('฿', '').trim() + ' บ.';
-  };
+        function initMonthSelects() {
+            const currentMonthIndex = new Date().getMonth();
+            const optionsHtml = MONTHS.map((m, i) => 
+                `<option value="${m}" ${i === currentMonthIndex ? 'selected' : ''}>${m}</option>`
+            ).join('');
+            
+            // ใส่ option ให้ทุก select ที่เกี่ยวกับเดือน
+            ['planStartMonth', 'monthName', 'editMonthName'].forEach(id => {
+                document.getElementById(id).innerHTML = optionsHtml;
+            });
+        }
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
+        function fetchData() {
+            document.getElementById('loading').style.display = 'block';
+            
+            if (IS_DEMO_MODE) {
+                setTimeout(() => {
+                    if (installmentsData.length === 0) {
+                        installmentsData = [
+                            { id: '1', item_name: 'iPhone 15', installment_no: '1/10', amount: 3200, month_name: 'สิงหาคม', is_paid: true },
+                            { id: '2', item_name: 'iPhone 15', installment_no: '2/10', amount: 3200, month_name: 'กันยายน', is_paid: false },
+                            { id: '3', item_name: 'iPhone 15', installment_no: '3/10', amount: 3200, month_name: 'ตุลาคม', is_paid: false },
+                            { id: '4', item_name: 'ตู้เย็น Samsung', installment_no: '8/10', amount: 1290, month_name: 'กันยายน', is_paid: false },
+                            { id: '5', item_name: 'ตู้เย็น Samsung', installment_no: '9/10', amount: 1290, month_name: 'ตุลาคม', is_paid: false },
+                        ];
+                    }
+                    finishLoad();
+                }, 500);
+            } else {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getInstallments' })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        installmentsData = data.data;
+                        finishLoad();
+                    } else {
+                        // กรณีเชื่อมต่อได้แต่ Backend ส่ง Error กลับมา
+                        alert('เกิดข้อผิดพลาดจากระบบ: ' + (data.message || 'Unknown error'));
+                        document.getElementById('loading').style.display = 'none';
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch Error:", err);
+                    alert('เชื่อมต่อฐานข้อมูลไม่ได้ (อาจเกิดจากสิทธิ์การเข้าถึง หรือ Internet)');
+                    document.getElementById('loading').style.display = 'none';
+                });
+            }
+        }
 
-  const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text ?? '';
-    return div.innerHTML;
-  };
+        function finishLoad() {
+            document.getElementById('loading').style.display = 'none';
+            renderGroupedList();
+            calculateSummary();
+        }
 
-  async function apiGet(action) {
-    const url = `${SCRIPT_URL}?action=${encodeURIComponent(action)}`;
-    const res = await fetch(url, { method: 'GET' });
-    return await res.json();
-  }
+        // --- Render ---
+        function renderGroupedList() {
+            const listContainer = document.getElementById('installment-list');
+            listContainer.innerHTML = '';
 
-  async function apiPost(action, payload) {
-    const body = new URLSearchParams();
-    body.set('action', action);
-    Object.entries(payload || {}).forEach(([k, v]) => body.set(k, String(v)));
+            if (installmentsData.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state">ยังไม่มีรายการผ่อน กดปุ่ม + เพื่อเริ่ม</div>';
+                return;
+            }
 
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-      body
-    });
+            const groups = {};
+            installmentsData.forEach(item => {
+                const name = item.item_name;
+                if (!groups[name]) groups[name] = [];
+                groups[name].push(item);
+            });
 
-    return await res.json();
-  }
+            const sortedGroupKeys = Object.keys(groups).sort((nameA, nameB) => {
+                const hasPendingA = groups[nameA].some(i => !(i.is_paid === true || i.is_paid === "TRUE"));
+                const hasPendingB = groups[nameB].some(i => !(i.is_paid === true || i.is_paid === "TRUE"));
+                if (hasPendingA !== hasPendingB) return hasPendingA ? -1 : 1;
+                return nameA.localeCompare(nameB);
+            });
 
-  const calculateSummary = (items) => {
-    const monthlyPayment = items.reduce((sum, item) => sum + (Number(item.monthlyAmount) || 0), 0);
-    const totalDebt = items.reduce((sum, item) => sum + ((Number(item.monthlyAmount) || 0) * (Number(item.months) || 0)), 0);
-    document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment);
-    document.getElementById('totalDebt').textContent = formatCurrency(totalDebt);
-  };
+            sortedGroupKeys.forEach(groupName => {
+                const items = groups[groupName];
+                let remainingAmount = 0;
+                let paidCount = 0;
+                
+                items.sort((a, b) => MONTHS.indexOf(a.month_name) - MONTHS.indexOf(b.month_name));
 
-  const renderItems = (items) => {
-    const listEl = document.getElementById('itemsList');
-    if (!items || items.length === 0) {
-      listEl.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">📭</div>
-          <p>ยังไม่มีรายการ บันทึกรายการแรกของคุณเลย!</p>
-        </div>`;
-      return;
-    }
+                items.forEach(item => {
+                    const isPaid = (item.is_paid === true || item.is_paid === "TRUE");
+                    if (isPaid) paidCount++;
+                    else remainingAmount += parseFloat(item.amount);
+                });
 
-    listEl.innerHTML = items.map((item) => {
-      const isCompleted = Number(item.months) === 0;
-      const totalDebt = (Number(item.monthlyAmount) || 0) * (Number(item.months) || 0);
+                const totalCount = items.length;
+                const percent = (paidCount / totalCount) * 100;
+                const isAllPaid = paidCount === totalCount;
+                const badgeClass = isAllPaid ? 'done' : 'active';
+                const badgeText = isAllPaid ? 'ครบแล้ว' : `เหลือ ${remainingAmount.toLocaleString()} ฿`;
 
-      return `
-        <div class="item-card ${isCompleted ? 'completed' : ''}">
-          <div class="item-header">
-            <div class="item-title">${escapeHtml(item.itemName)}</div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <span class="item-bank">${escapeHtml(item.bankName)}</span>
-              ${isCompleted ? '<span class="item-status">✓ ผ่อนหมดแล้ว</span>' : ''}
-            </div>
-          </div>
+                const groupCard = document.createElement('div');
+                groupCard.className = `group-card ${isAllPaid ? 'all-done' : ''}`;
+                
+                groupCard.innerHTML = `
+                    <div class="group-header" onclick="toggleGroup(this)">
+                        <div class="group-info">
+                            <div class="group-title">${groupName}</div>
+                            <div class="group-meta">
+                                <span class="group-badge ${badgeClass}">${badgeText}</span>
+                                <span style="font-size:0.8rem; color:#999;">(${paidCount}/${totalCount} งวด)</span>
+                            </div>
+                        </div>
+                        <div class="group-actions" onclick="event.stopPropagation()">
+                            <button class="btn-icon edit" onclick="editGroupName('${groupName}')" title="เปลี่ยนชื่อรายการ">${ICON_EDIT}</button>
+                            <button class="btn-icon delete" onclick="deleteGroup('${groupName}')" title="ลบทั้งกลุ่ม">${ICON_TRASH}</button>
+                        </div>
+                        <div class="chevron">▼</div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="sub-list">
+                        ${items.map(item => createSubItemHTML(item)).join('')}
+                    </div>
+                `;
 
-          <div class="item-details">
-            <div class="detail-item">
-              <div class="detail-label">ผ่อนเดือนละ</div>
-              <div class="detail-value">${formatCurrency(item.monthlyAmount)}</div>
-            </div>
-            <div class="detail-item detail-highlight">
-              <div class="detail-label">เหลืออีก</div>
-              <div class="detail-value">${Number(item.months)} เดือน</div>
-            </div>
-            <div class="detail-item">
-              <div class="detail-label">หนี้คงเหลือ</div>
-              <div class="detail-value">${formatCurrency(totalDebt)}</div>
-            </div>
-            <div class="detail-item">
-              <div class="detail-label">วันที่บันทึก</div>
-              <div class="detail-value">${formatDate(item.timestamp)}</div>
-            </div>
-          </div>
+                listContainer.appendChild(groupCard);
+            });
+        }
 
-          <div class="item-actions">
-            <button class="btn-pay" onclick="payInstallment(${item.rowId})" ${isCompleted ? 'disabled' : ''}>
-              ${isCompleted ? '✓ ผ่อนหมดแล้ว' : '✓ จ่ายงวดนี้'}
-            </button>
-            <button class="btn-delete" onclick="deleteItem(${item.rowId})">🗑 ลบรายการ</button>
-          </div>
-        </div>`;
-    }).join('');
-  };
+        function createSubItemHTML(item) {
+            const isChecked = (item.is_paid === true || item.is_paid === "TRUE");
+            // encode data เพื่อส่งเข้าฟังก์ชัน edit
+            const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
+            
+            return `
+                <div class="sub-item ${isChecked ? 'paid' : ''}">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePaid('${item.id}', this.checked)">
+                        <span class="checkmark"></span>
+                    </label>
+                    <div class="sub-info">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="sub-month">${item.month_name}</span>
+                            <span class="sub-installment">${item.installment_no}</span>
+                        </div>
+                        <span class="sub-amount">${parseFloat(item.amount).toLocaleString()} ฿</span>
+                    </div>
+                    <div class="sub-actions">
+                        <button class="btn-sub-action edit" onclick="openEditModal('${itemJson}')">${ICON_EDIT_SM}</button>
+                        <button class="btn-sub-action delete" onclick="deleteItem('${item.id}')">${ICON_TRASH_SM}</button>
+                    </div>
+                </div>
+            `;
+        }
 
-  async function loadData() {
-    try {
-      const data = await apiGet('getData');
-      if (!data.success) throw new Error(data.message || 'โหลดข้อมูลไม่สำเร็จ');
-      renderItems(data.items);
-      calculateSummary(data.items);
-    } catch (err) {
-      showAlert('โหลดข้อมูลไม่ได้: ' + err.message, 'error');
-    }
-  }
+        function toggleGroup(headerElement) {
+            const card = headerElement.parentElement;
+            card.classList.toggle('open');
+        }
 
-  document.getElementById('addForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    try {
-      const payload = {
-        itemName: document.getElementById('itemName').value,
-        bankName: document.getElementById('bankName').value,
-        monthlyAmount: document.getElementById('monthlyAmount').value,
-        months: document.getElementById('months').value
-      };
-      const res = await apiPost('addData', payload);
-      if (!res.success) throw new Error(res.message || 'บันทึกไม่สำเร็จ');
+        // --- Logic: Delete/Edit Group ---
 
-      showAlert('✓ บันทึกรายการสำเร็จ!', 'success');
-      document.getElementById('addForm').reset();
-      await loadData();
-    } catch (err) {
-      showAlert('บันทึกไม่ได้: ' + err.message, 'error');
-    }
-  });
+        function deleteGroup(groupName) {
+            if(!confirm(`ยืนยันลบรายการ "${groupName}" ทั้งหมด?\n(รายการย่อยทั้งหมดจะหายไป)`)) return;
 
-  async function payInstallment(rowId) {
-    if (!confirm('คุณต้องการจ่ายงวดนี้หรือไม่?')) return;
-    try {
-      const res = await apiPost('updateData', { rowId });
-      if (!res.success) throw new Error(res.message || 'จ่ายงวดไม่สำเร็จ');
+            // หา ID ทั้งหมดในกลุ่ม
+            const itemsToDelete = installmentsData.filter(i => i.item_name === groupName);
+            const ids = itemsToDelete.map(i => i.id);
 
-      showAlert('✓ จ่ายงวดสำเร็จ!', 'success');
-      await loadData();
-    } catch (err) {
-      showAlert('จ่ายงวดไม่ได้: ' + err.message, 'error');
-    }
-  }
+            // ลบ Local
+            installmentsData = installmentsData.filter(i => i.item_name !== groupName);
+            renderGroupedList();
+            calculateSummary();
 
-  async function deleteItem(rowId) {
-    if (!confirm('คุณต้องการลบรายการนี้หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้')) return;
-    try {
-      const res = await apiPost('deleteData', { rowId });
-      if (!res.success) throw new Error(res.message || 'ลบไม่สำเร็จ');
+            if (!IS_DEMO_MODE) {
+                // ส่งคำสั่งลบทีละตัว
+                ids.forEach(id => {
+                    fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'deleteInstallment', id: id })
+                    });
+                });
+            }
+        }
 
-      showAlert('✓ ลบรายการสำเร็จ!', 'success');
-      await loadData();
-    } catch (err) {
-      showAlert('ลบไม่ได้: ' + err.message, 'error');
-    }
-  }
+        function editGroupName(oldName) {
+            const newName = prompt("ใส่ชื่อรายการใหม่:", oldName);
+            if (!newName || newName === oldName) return;
 
-  window.addEventListener('load', loadData);
-</script>
+            // แก้ไข Local
+            installmentsData.forEach(item => {
+                if(item.item_name === oldName) item.item_name = newName;
+            });
+            renderGroupedList();
+
+            if (!IS_DEMO_MODE) {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'renameGroup', oldName: oldName, newName: newName })
+                }).catch(e => console.log('Backend might not support renameGroup yet'));
+            }
+        }
+
+        // --- Logic: Edit Single Item ---
+
+        function openEditModal(itemJson) {
+            const item = JSON.parse(itemJson);
+            document.getElementById('editId').value = item.id;
+            document.getElementById('editItemName').value = item.item_name;
+            document.getElementById('editInstallmentNo').value = item.installment_no;
+            document.getElementById('editAmount').value = item.amount;
+            document.getElementById('editMonthName').value = item.month_name;
+            
+            openModal('editModal');
+        }
+
+        function handleEditSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const idx = installmentsData.findIndex(x => String(x.id) === String(id));
+            
+            if (idx === -1) return;
+
+            const updatedItem = {
+                ...installmentsData[idx],
+                item_name: document.getElementById('editItemName').value,
+                installment_no: document.getElementById('editInstallmentNo').value,
+                amount: document.getElementById('editAmount').value,
+                month_name: document.getElementById('editMonthName').value
+            };
+
+            // Update Local
+            installmentsData[idx] = updatedItem;
+            closeModal('editModal');
+            renderGroupedList();
+            calculateSummary();
+
+            if(!IS_DEMO_MODE) {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'updateInstallment', data: updatedItem })
+                });
+            }
+        }
+
+        // --- Logic: Basic Operations ---
+
+        function calculateSummary() {
+            let monthTotal = 0;
+            let grandTotalRemaining = 0;
+            const currentMonthName = MONTHS[new Date().getMonth()];
+
+            installmentsData.forEach(item => {
+                const isPaid = (item.is_paid === true || item.is_paid === "TRUE");
+                const amount = parseFloat(item.amount);
+                if (!isPaid) {
+                    grandTotalRemaining += amount;
+                    if (item.month_name === currentMonthName) {
+                        monthTotal += amount;
+                    }
+                }
+            });
+
+            document.getElementById('month-amount').innerText = monthTotal.toLocaleString();
+            document.getElementById('total-remaining').innerText = grandTotalRemaining.toLocaleString();
+        }
+
+        function togglePaid(id, isPaid) {
+            const idx = installmentsData.findIndex(x => String(x.id) === String(id));
+            if(idx > -1) {
+                installmentsData[idx].is_paid = isPaid;
+                renderGroupedList();
+                calculateSummary();
+            }
+            if (!IS_DEMO_MODE) {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'togglePaid', id: id, is_paid: isPaid })
+                });
+            }
+        }
+
+        function deleteItem(id) {
+            if(!confirm('ลบงวดนี้ใช่ไหม?')) return;
+            installmentsData = installmentsData.filter(x => String(x.id) !== String(id));
+            renderGroupedList();
+            calculateSummary();
+            if (!IS_DEMO_MODE) {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'deleteInstallment', id: id })
+                });
+            }
+        }
+
+        async function handlePlanSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'กำลังสร้าง...';
+            btn.disabled = true;
+
+            const name = document.getElementById('planName').value;
+            const total = parseFloat(document.getElementById('planTotal').value);
+            const monthsCount = parseInt(document.getElementById('planMonths').value);
+            const startMonthName = document.getElementById('planStartMonth').value;
+            const amountPerMonth = (total / monthsCount).toFixed(2);
+            let startIdx = MONTHS.indexOf(startMonthName);
+
+            const itemsToAdd = [];
+            for (let i = 0; i < monthsCount; i++) {
+                let monthIdx = (startIdx + i) % 12;
+                itemsToAdd.push({
+                    item_name: name,
+                    installment_no: `${i + 1}/${monthsCount}`,
+                    amount: amountPerMonth,
+                    month_name: MONTHS[monthIdx]
+                });
+            }
+
+            if (IS_DEMO_MODE) {
+                itemsToAdd.forEach(item => {
+                    item.id = Date.now() + Math.random().toString();
+                    item.is_paid = false;
+                    installmentsData.push(item);
+                });
+                finishAdd(btn, originalText);
+                return;
+            }
+
+            // Loop add
+            try {
+                for (const item of itemsToAdd) {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'addInstallment', data: item })
+                    });
+                }
+                fetchData();
+            } catch (err) { alert('Error adding some items'); }
+            finally { finishAdd(btn, originalText); }
+        }
+
+        function handleSingleSubmit(e) {
+            e.preventDefault();
+            const newData = {
+                item_name: document.getElementById('itemName').value,
+                installment_no: document.getElementById('installmentNo').value,
+                amount: document.getElementById('amount').value,
+                month_name: document.getElementById('monthName').value
+            };
+            if (IS_DEMO_MODE) {
+                newData.id = Date.now().toString();
+                newData.is_paid = false;
+                installmentsData.push(newData);
+                finishAdd(null, null);
+                return;
+            }
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'addInstallment', data: newData }) })
+                .then(() => { fetchData(); finishAdd(null, null); });
+        }
+
+        function finishAdd(btn, originalText) {
+            if(btn) { btn.innerText = originalText; btn.disabled = false; }
+            document.getElementById('planName').value = '';
+            document.getElementById('planTotal').value = '';
+            closeModal('addModal');
+            renderGroupedList();
+            calculateSummary();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
